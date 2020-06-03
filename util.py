@@ -6,7 +6,7 @@ import math
 import shutil
 
 
-class PreProcess():
+class Util():
     def __init__(self,image_folder="",save_folder="./temp/",image_format="jpeg",roi=200):
         self.image_folder = image_folder
         self.save_folder = save_folder

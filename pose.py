@@ -11,7 +11,7 @@ import shutil
 class Pose():
     def __init__(self,folder):
         self.folder = folder
-        ut = util.PreProcess()
+        ut = util.Util()
         for filename in glob.glob(self.folder+"*kpt.txt"):            
             basename = os.path.basename(filename)
             frame = basename.split("_")[0]
@@ -154,7 +154,7 @@ class Pose():
             data = np.append(np.array([frameNo]),pose)
             dataset = np.vstack([dataset, data])
             
-        ut = util.PreProcess()
+        ut = util.Util()
         temp = np.copy(dataset)
         # temp = ut.weightedAvergage(temp,total_frames,beta=beta)
         

@@ -1,6 +1,6 @@
 import sys
 sys.path.insert(1, "./PRNet/")
-import util as ut
+import util
 import os
 import demo
 import pose
@@ -8,14 +8,14 @@ import video_writer
 
 data = False ## Set True if facial keypoints already captured
 
-data_folder = "Ari" ## Name of the folder to get the head pose for
+data_folder = "test" ## Name of the folder to get the head pose for
 img_format="jpeg"
 
 image_folder = "./data/"+data_folder+"/"
 save_folder = "./Results/"+data_folder+"/"
     
 if not data:
-    ut = ut.PreProcess(image_folder,roi=200, image_format=img_format)
+    ut = util.Util(image_folder,roi=200, image_format=img_format)
     folder = ut.processImage()
     
     os.chdir("./PRNet/")

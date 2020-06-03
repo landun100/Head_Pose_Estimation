@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import glob
-import matplotlib.pyplot as plt
 
 
 class Video():
@@ -12,6 +11,10 @@ class Video():
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
         fps = fps
         font = cv2.FONT_HERSHEY_SIMPLEX
+        
+        img = cv2.imread(img_path+"frame0."+img_format)
+        H,W = img.shape[:-1]
+        video = cv2.VideoWriter("./Results/"+headpose+".mp4",fourcc,fps,(W,H))
         
         num_images = len(glob.glob(img_path+"*"+img_format))
         for k in range(num_images):
@@ -52,10 +55,9 @@ class Video():
                     self.img_plot = img_plot
                 except:
                     pass
-                H,W = img.shape[:-1]
+
                 h,w = self.img_plot.shape[:-1]
-            else:
-                video = cv2.VideoWriter("./Results/"+headpose+".mp4",fourcc,fps,(W,H))
+            
                 if trans:
                     sub_img = img[H-h:,:w,:]
                     sub_img[self.img_plot!=255] = 0
@@ -66,6 +68,6 @@ class Video():
                     img[H-h:,:w,:] = add        
                 else:
                     img[H-h:,:w,:] = self.img_plot
-            
-            video.write(img)
+       
+            video.write(img)          
         video.release()
