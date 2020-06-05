@@ -142,9 +142,9 @@ class Pose():
             missing_frames = np.int_(np.loadtxt(self.folder+"missing_frames.txt"))
             total_frames+= len(missing_frames)
 
-        for x in range(total_frames):
+        for filename in sorted(glob.glob(self.folder+"pose*")):
             try:
-                filename = self.folder+"pose"+str(x)+".txt"
+                # filename = self.folder+"pose"+str(x)+".txt"
                 basename = os.path.basename(filename)
                 frameNo = int(basename[4:-4])
                 pose = np.loadtxt(filename,dtype=np.float64)
@@ -164,7 +164,12 @@ class Pose():
                 pass
         else:
             if estimate:
-                regressed_pose = ut.estimateFrames(temp, missing_frames,curve=curve)
+                regressed_pose,gaps = ut.estimateFrames(temp, missing_frames,curve=curve)
+                try:
+                    gaps[1]
+                    multi = True
+                except:
+                    multi = False
                 
             else:
                 regressed_pose = dataset ## Change this later
@@ -182,7 +187,17 @@ class Pose():
             dataset_raw = dataset[np.int_(dataset[:,0]) == 0].reshape(-1,4)                
             
             highlight = False
-            for x in range(1,total_frames):
+            
+            gaps = gaps[0]
+            try:
+                if len(gaps[1]) > 1:
+                    multi=True     
+            except:
+                pass
+                
+            pointer=0
+            predicted = np.zeros_like(gaps)
+            for x in range(1,len(regressed_pose)):
                 data_regressed = regressed_pose[np.int_(regressed_pose[:,0]) == x].reshape(-1,4)
                 data_raw = dataset[np.int_(dataset[:,0]) == x].reshape(-1,4) 
                 
@@ -196,11 +211,22 @@ class Pose():
                     fig = plt.figure(figsize=(16,9))
                     ax = fig.add_subplot(111)
                     
-                    if x in missing_frames: ## Will go here if there x is predicted or regressed
-                        if not highlight:
-                            predicted = dataset_regressed[-1,:]
-                        highlight = True
-                        predicted = np.vstack([predicted,data_regressed])
+                    if multi:                        
+                        for gap in range(len(gaps)):                        
+                            if x in gaps[gap]: ## Will go here if x is regressed or estimated
+                                if gap == pointer:
+                                    predicted[gap] = dataset_regressed[-1,:]
+                                    pointer+=1
+                                highlight = True
+                                predicted[gap] = np.vstack([predicted[gap],data_regressed])
+                            
+                    else:
+                        if x in missing_frames: ## Will go here if there x is predicted or regressed
+                            if not highlight:
+                                predicted = dataset_regressed[-1,:]
+                            highlight = True
+                            predicted = np.vstack([predicted,data_regressed])
+
     
                     ax.scatter(dataset_raw[:,0],dataset_raw[:,1],color="k",label="roll (raw)")
                     ax.scatter(dataset_raw[:,0],dataset_raw[:,2],color="b", label = "pitch (raw)")
@@ -224,9 +250,18 @@ class Pose():
                             text = " (regressed)"
                         elif estimate:
                             text = " (estimated)"
-                        ax.plot(predicted[:,0],predicted[:,1],color="g",linewidth=5, label="roll"+text)
-                        ax.plot(predicted[:,0],predicted[:,2],color="g",linewidth=5, label = "pitch"+text)
-                        ax.plot(predicted[:,0],predicted[:,3],color="g",linewidth=5, label = "yaw"+text)
+                        if multi:
+                            for gap in range(pointer):
+    
+                                ax.plot(predicted[gap][:,0],predicted[gap][:,1],color="g",linewidth=5, label="roll"+text)
+                                ax.plot(predicted[gap][:,0],predicted[gap][:,2],color="g",linewidth=5, label = "pitch"+text)
+                                ax.plot(predicted[gap][:,0],predicted[gap][:,3],color="g",linewidth=5, label = "yaw"+text)
+             
+                        else:
+                            ax.plot(predicted[:,0],predicted[:,1],color="g",linewidth=5, label="roll"+text)
+                            ax.plot(predicted[:,0],predicted[:,2],color="g",linewidth=5, label = "pitch"+text)
+                            ax.plot(predicted[:,0],predicted[:,3],color="g",linewidth=5, label = "yaw"+text)
+                            
                         lines = ax.get_lines()
                         legend3 = ax.legend([lines[i] for i in [3,4,5]],["roll"+text,"pitch"+text,"yaw"+text ],loc = "upper right",fontsize="20")
                         ax.add_artist(legend3)     
@@ -237,5 +272,5 @@ class Pose():
                     plt.ylim([-90,90])
                     plt.xlabel("frames")
                     plt.ylabel("degrees")
-                    plt.savefig(self.folder+"/plots/regressed"+str(int(data_regressed[0][0]))+".png",bbox_inches="tight")
-                np.savetxt(self.folder+"regressed"+str(int(data_regressed[0][0]))+".txt",data_regressed[0][1:])
+                    plt.savefig(self.folder+"/plots/regressed"+str(int(data_regressed[0][0])).zfill(5)+".png",bbox_inches="tight")
+                np.savetxt(self.folder+"regressed"+str(int(data_regressed[0][0])).zfill(5)+".txt",data_regressed[0][1:])

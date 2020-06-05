@@ -8,7 +8,7 @@ import video_writer
 
 data = False ## Set True if facial keypoints already captured
 
-data_folder = "test" ## Name of the folder to get the head pose for
+data_folder = "test3" ## Name of the folder to get the head pose for
 img_format="jpeg"
 
 image_folder = "./data/"+data_folder+"/"
@@ -16,13 +16,13 @@ save_folder = "./Results/"+data_folder+"/"
     
 if not data:
     ut = util.Util(image_folder,roi=200, image_format=img_format)
-    folder = ut.processImage()
+    folder = ut.processImage(movement=True)
     
     os.chdir("./PRNet/")
     demo.PRNet(folder,save_folder)
     os.chdir("..")
     
 head_pose = pose.Pose(save_folder)
-head_pose.regress(estimate=True,save_plot=True,beta=0.7,curve=8)
+head_pose.regress(estimate=True,save_plot=True,beta=0.7,curve=3)
 
 video_writer.Video(image_folder, save_folder,plot=True)

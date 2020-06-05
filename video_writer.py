@@ -12,24 +12,24 @@ class Video():
         fps = fps
         font = cv2.FONT_HERSHEY_SIMPLEX
         
-        img = cv2.imread(img_path+"frame0."+img_format)
+        img = cv2.imread(img_path+"frame00001."+img_format)
         H,W = img.shape[:-1]
         video = cv2.VideoWriter("./Results/"+headpose+".mp4",fourcc,fps,(W,H))
         
         num_images = len(glob.glob(img_path+"*"+img_format))
         for k in range(num_images):
             try:
-                img = cv2.imread(img_path+"frame"+str(k)+"."+img_format)
+                img = cv2.imread(img_path+"frame"+str(k).zfill(5)+"."+img_format)
                 len(img)
             except:
                 continue
 
             try:
                 
-                kp = glob.glob(annot_path+"frame"+str(k)+"_*"+"kpt.txt")[0]
+                kp = glob.glob(annot_path+"frame"+str(k).zfill(5)+"_*"+"kpt.txt")[0]
                 top,left = int(kp.split("_")[1]), int(kp.split("_")[2])    
                 
-                pose = np.loadtxt(annot_path+"pose"+str(k)+".txt") 
+                pose = np.loadtxt(annot_path+"pose"+str(k).zfill(5)+".txt") 
                 
                 roll = "roll: "+str(-pose[0])[:7] + " (raw)"
                 pitch = "pitch: "+str(pose[1])[:7]+ " (raw)"
@@ -50,7 +50,7 @@ class Video():
 
             if plot and (k!=0):
                 try:
-                    img_plot = cv2.imread(plot_path+"regressed"+str(k)+".png")
+                    img_plot = cv2.imread(plot_path+"regressed"+str(k).zfill(5)+".png")
                     len(img_plot)
                     self.img_plot = img_plot
                 except:
