@@ -2,8 +2,10 @@ import cv2
 import dlib
 from imutils import face_utils
 
-
 class FaceDetector():
+    '''
+    Neural Net and Haar based face detectors       
+    '''
     
     def dlib_frontal_face(self,image):
         x,y,w,h = -1,-1,-1,-1
@@ -12,8 +14,6 @@ class FaceDetector():
         rects = face_detect(gray, 1)
         for (i, rect) in enumerate(rects):
             (x, y, w, h) = face_utils.rect_to_bb(rect)
-        # cv2.rectangle(gray, (x, y), (x+w, y+h), (255, 255, 255), 2)
-        # self.show(gray)
         return x,y,x+w,y+h
     
         
@@ -47,11 +47,10 @@ class FaceDetector():
                 y1 = int(detections[0, 0, i, 4] * frameHeight)
                 x2 = int(detections[0, 0, i, 5] * frameWidth)
                 y2 = int(detections[0, 0, i, 6] * frameHeight)
-        # cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
-        # self.show(image)
+
         return x1,y1,x2,y2
     
-    def detect(self,image,frameNo):
+    def detect(self,image,frameNo): ## Will try to detect face using Haar based detector if opencv (NN based) detector fails
         success = True
         top,left,bottom,right = self.opencv_cnn(image)
         if top == -1 and frameNo == 0:
@@ -62,24 +61,3 @@ class FaceDetector():
             success = False            
         return success,[top,left,bottom,right]
     
-    def show(self,image):
-        cv2.imshow("img",image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-

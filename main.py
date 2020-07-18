@@ -1,28 +1,41 @@
-import sys
-sys.path.insert(1, "./PRNet/")
 import util
 import os
 import demo
-import pose
-import video_writer
+import warnings
+warnings.filterwarnings("ignore")
+import argparse
+import shutil
 
-data = False ## Set True if facial keypoints already captured
 
-data_folder = "test3" ## Name of the folder to get the head pose for
-img_format="jpeg"
 
-image_folder = "./data/"+data_folder+"/"
-save_folder = "./Results/"+data_folder+"/"
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-t", action="store", dest="t_p", type=str, help="Test path")
+    parser.add_argument("-f", action="store_true", dest="f_d", default=False, help="Force detection")
+    args = vars(parser.parse_args())
+    test_path = args["t_p"]   
+   
+    if test_path == "":
+        print("No test path given!")        
+        return
+        
+    kpt_file_path = os.path.join(test_path, "kpt.txt")
+    kpt_file_exists = os.path.isfile(kpt_file_path)
+    # force_detection = args["f_d"]
+    img_format = "jpeg"
     
-if not data:
-    ut = util.Util(image_folder,roi=200, image_format=img_format)
-    folder = ut.processImage(movement=True)
+    force_detection = False
     
-    os.chdir("./PRNet/")
-    demo.PRNet(folder,save_folder)
-    os.chdir("..")
+    ut = util.Util(test_path, roi=300, image_format=img_format)
+        
+    if not kpt_file_exists or force_detection:
+        ut.processImage()
+        
+        demo.PRNet(test_path)
+        
+    shutil.rmtree(os.path.join(test_path, "temp"))
     
-head_pose = pose.Pose(save_folder)
-head_pose.regress(estimate=True,save_plot=True,beta=0.7,curve=3)
 
-video_writer.Video(image_folder, save_folder,plot=True)
+if __name__ == "__main__":
+
+    main()
