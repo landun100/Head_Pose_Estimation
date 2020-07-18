@@ -18,6 +18,6 @@ The result is an end-to-end pipeline that seamlessly estimates very accurate fac
 
 ## Result
 
-![ezgif com-optimize (1)](https://user-images.githubusercontent.com/49958651/87860515-1528b000-c90c-11ea-9797-1fb15041576d.gif)
+ <div align=”center”> ![ezgif com-optimize (1)](https://user-images.githubusercontent.com/49958651/87860515-1528b000-c90c-11ea-9797-1fb15041576d.gif)</div>
 
 
