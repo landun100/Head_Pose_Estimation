@@ -8,6 +8,10 @@ This page contains the python code to robustly estimate the rotations of the hea
 
 The result is an end-to-end pipeline that seamlessly estimates very accurate facial pose for extreme rotations as well.
 
+
+## Pose Calculation Example: Roll
+![Screenshot from 2020-06-08 12-25-50](https://user-images.githubusercontent.com/49958651/87858493-4600e900-c8fc-11ea-8d7e-1f0ab9c353c3.png)
+
 ## Usage
 
 1. Usage example: python main.py -t "image_folder"
