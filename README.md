@@ -16,3 +16,6 @@ The result is an end-to-end pipeline that seamlessly estimates very accurate fac
 
 1. Usage example: python main.py -t "image_folder"
 
+## Result
+![ezgif com-crop (1)](https://user-images.githubusercontent.com/49958651/87860334-97b07000-c90a-11ea-9004-577752461ec8.gif)
+
