@@ -14,7 +14,8 @@ The result is an end-to-end pipeline that seamlessly estimates very accurate fac
 
 ## Usage
 
-1. Usage example: #python main.py -t "image_folder"
+1. Usage example: 
+##python main.py -t "image_folder"
 
 ## Result
 
