@@ -37,7 +37,7 @@ class Util():
         '''
         frames = glob.glob(os.path.join(self.test_path,"*"+self.image_format))
         labels = {}
-        dummy = np.zeros((self.roi,self.roi,3))
+        missing = np.array([])
         for frame in frames: ## Sort Images
             frame = os.path.split(frame)[-1][5:-5].zfill(5)
             new = {frame:str(int(frame))}
@@ -49,8 +49,7 @@ class Util():
             basename = os.path.basename(self.file)
 
             image = cv2.imread(self.file)
-            success,bbox = self.face_detector.detect(image,self.global_frame)            
-            name = basename.split(".")[0]
+            success,bbox = self.face_detector.detect(image,self.global_frame)
             
             if success:
                 self.top,self.left,self.bottom,self.right = bbox
@@ -59,16 +58,16 @@ class Util():
             try:
                 image = image[self.left:self.right,self.top:self.bottom]
             except:
-                dummy_path = os.path.join(self.temp_path, name+"_"+str(1000)+"_"+str(1000)+".jpg") ## Saving blank image, as saving image as it is without BBox can create false positives
-                cv2.imwrite(dummy_path, dummy)                
+                missing = np.append(missing,int(self.frameNo))
                 continue
-
+            name = basename.split(".")[0]
             image_path = os.path.join(self.temp_path, name+"_"+str(self.top)+"_"+str(self.left)+".jpg")
             cv2.imwrite(image_path, image)
             
             if not bad_light:
                 self.global_frame += 1
-
+        if len(missing):
+            np.savetxt(os.path.join(self.test_path,"missing.txt"),missing)
     
     def enlarge(self,bbox): ## Extract the facial area
         top,left,bottom,right = bbox
@@ -79,7 +78,48 @@ class Util():
         self.bottom = max(0,self.bottom)
         self.right = max(0,self.right)
         
-
+    def readKPT(self): ## structuring the kpt.txt file
+        data = np.array([]).reshape(1,-1)
+        with open (os.path.join(self.test_path,"kpt.txt"),"r") as f:
+            lines = f.readlines()
+        for line in lines:
+            line = line.replace("\n","")
+            line = line.split(",")
+            line = np.array(line).reshape(1,-1)
+            line = line.astype(np.float)
+            data = np.hstack([data,line])
+        data = data.reshape(68,-1)
+        np.savetxt(os.path.join(self.test_path,"kp.txt"),data)
         
-
+    def getCenter(self,points):
+        p0 = points[0]
+        p1 = points[1]
+        
+        x = (p0[0] + p1[0])/2
+        y = (p0[1] + p1[1])/2
+        z = (p0[2] + p1[2])/2        
+        return np.array([x,y,z])    
+    
+    def getAngle(self,point,type_):
+        if type_ == "roll":        
+            rise = point[1] 
+            run = point[0]
+        elif type_ == "yaw":
+            rise = point[2] 
+            run = point[0]
+        elif type_=="pitch":
+            rise = point[1] 
+            run = point[2]
+        theta = math.degrees(math.atan(rise/run))        
+        return theta
+    
+    def getDist(self,points,type_):
+        p0,p1 = points
+        if type_=="roll":
+            d = ((p0[0]-p1[0])**2 + (p0[2]-p1[2])**2)**0.5
+        elif type_=="yaw":
+            d = ((p0[0]-p1[0])**2 + (p0[1]-p1[1])**2)**0.5
+        elif type_=="pitch":
+            d = ((p0[0]-p1[0])**2 + (p0[2]-p1[2])**2)**0.5
+        return d
             

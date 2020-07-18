@@ -31,7 +31,7 @@ class PRNet():
         
         image_paths = []
         maxFrame = 0
-        
+
         for image_path in os.listdir(temp_path):
             if image_path.endswith(".jpg"):
                 image_paths.append(os.path.join(temp_path, image_path))
@@ -45,70 +45,52 @@ class PRNet():
         sorted_image_paths = []
         
         while frameNum <= maxFrame:
-            found = False
-            
             for image_path in image_paths:
                 name = os.path.split(image_path)[-1]
                 
                 if name.startswith("frame" + str(frameNum) + "_"):
                     sorted_image_paths.append(image_path)
-                    found = True
                     break
-                    
-            if not found:
-                sorted_image_paths.append('NA')
             
             frameNum += 1
         
         for image_path in sorted_image_paths:
-            if image_path != 'NA':
-                name = os.path.split(image_path.strip())[-1][:-4]
-        
-                # read image
-                image = imread(image_path)
-                [h, w, c] = image.shape
-                if c>3:
-                    image = image[:,:,:3]
-                    
-                max_size = max(image.shape[0], image.shape[1])
+            name = os.path.split(image_path.strip())[-1][:-4]
+    
+            # read image
+            image = imread(image_path)
+            [h, w, c] = image.shape
+            if c>3:
+                image = image[:,:,:3]
                 
-                if max_size> 1000:
-                    image = rescale(image, 1000./max_size)
-                    image = (image*255).astype(np.uint8)
-                    
-                pos = prn.process(image) # use dlib to detect face
+            max_size = max(image.shape[0], image.shape[1])
+            
+            if max_size> 1000:
+                image = rescale(image, 1000./max_size)
+                image = (image*255).astype(np.uint8)
                 
-                image = image/255.
-                
-                kpts = []
-                
-                if pos is not None:
-                    # get landmarks
-                    kpts = prn.get_landmarks(pos)
-                else:
-                    index = 0
-                    
-                    while index < 68:
-                        kpts.append([1000.0,1000.0,1000.0])
-                        index += 1
+            pos = prn.process(image) # use dlib to detect face
+            
+            image = image/255.
+            
+            kpts = []
+            
+            if pos is not None:
+                # get landmarks
+                kpts = prn.get_landmarks(pos)
             else:
-                kpts = []
-                
                 index = 0
                 
                 while index < 68:
                     kpts.append([1000.0,1000.0,1000.0])
                     index += 1
-                
+                      
             kpt_frames.append(kpts)
             
         kpt_path = os.path.join(test_path, "kpt.txt")
             
         pt_index = 0
-        pt_count = 0
-        
-        if len(kpt_frames) != 0:
-            pt_count = len(kpt_frames[0])
+        pt_count = len(kpt_frames[0])
 
         lines = []
 
