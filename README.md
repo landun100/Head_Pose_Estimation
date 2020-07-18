@@ -10,11 +10,5 @@ The result is an end-to-end pipeline that seamlessly estimates very accurate fac
 
 ## Usage
 
-1. Clone the repository
-
-2. Download the PRN model from here: https://drive.google.com/file/d/1UoE-XuW1SDLUjZmJPkIZ1MLxvQFgmTFH/view and put it into PRNet/Data/net-data
-
-3. Add the folder containing images in data/
-
-4. Run the main.py file
+1. Usage example: python main.py -t "image_folder"
 
